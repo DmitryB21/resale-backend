@@ -1,9 +1,10 @@
 package com.skypro.resale.service.impl;
 
-import com.skypro.resale.dto.AdsDto;
-import com.skypro.resale.dto.CommentDto;
-import com.skypro.resale.dto.CreateOrUpdateAd;
-import com.skypro.resale.dto.ExtendedAd;
+import com.skypro.resale.dto.*;
+import com.skypro.resale.mapper.AdsMapper;
+import com.skypro.resale.model.Ad;
+import com.skypro.resale.model.Image;
+import com.skypro.resale.repository.AdRepository;
 import com.skypro.resale.service.AdsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,19 +13,30 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
 public class AdsServiceImpl implements AdsService {
 
+    private final AdRepository adRepository;
+    private final ImageServiceImpl imageService;
 
-    public List<AdsDto> getAllAds() {
-        return new ArrayList<>();
+
+    public List<AdDto> getAllAds() {
+        return adRepository.findAll().stream()
+                .map(ad -> AdsMapper.INSTANCE.toDto(ad))
+                .collect(Collectors.toList());
     }
 
-    public AdsDto addAds(MultipartFile image, CreateOrUpdateAd createOrUpdateAd) {
-        return new AdsDto();
+    public AdDto addAds(MultipartFile image, CreateOrUpdateAd createOrUpdateAd) throws IOException {
+        Ad ad = AdsMapper.INSTANCE.toModel(createOrUpdateAd);
+//        User user = userService.getUserByUsername(authentication.getName());
+//        ad.setAuthor(user);
+        Image imageUpload = imageService.uploadImage(image);
+        ad.setImage(imageUpload);
+        return AdsMapper.INSTANCE.toDto(adRepository.save(ad));
     }
 
     public ExtendedAd getAdsById(Integer id) {

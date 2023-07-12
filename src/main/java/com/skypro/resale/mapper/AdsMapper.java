@@ -1,6 +1,7 @@
 package com.skypro.resale.mapper;
 
 import com.skypro.resale.dto.AdDto;
+import com.skypro.resale.dto.AdsDto;
 import com.skypro.resale.dto.CreateOrUpdateAd;
 import com.skypro.resale.dto.ExtendedAd;
 import com.skypro.resale.model.Ad;
@@ -23,7 +24,7 @@ public interface AdsMapper {
     @Mapping(target = "pk", source = "id")
     @Mapping(target = "author", source = "author.id")
  //   @Mapping(target = "image", source = "image", qualifiedByName = "imageMapping")
-    AdDto toDto(Ad ads);
+    AdDto toDto(Ad ad);
 
     @Mapping(target = "authorFirstName", source = "author.firstName")
     @Mapping(target = "authorLastName", source = "author.lastName")

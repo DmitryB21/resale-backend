@@ -30,10 +30,10 @@ public class AdsController {
                     @ApiResponse(
                             responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = AdsDto.class))})
+                                    schema = @Schema(implementation = AdDto.class))})
             }
     )
-    public ResponseEntity<List<AdsDto>> getAllAds() {
+    public ResponseEntity<List<AdDto>> getAllAds() {
         return ResponseEntity.ok(adsService.getAllAds());
     }
 
@@ -50,7 +50,7 @@ public class AdsController {
             }
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdsDto> addAds(@RequestPart("image") MultipartFile image,
+    public ResponseEntity<AdDto> addAds(@RequestPart("image") MultipartFile image,
                                          @RequestPart("properties") CreateOrUpdateAd createOrUpdateAd) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(adsService.addAds(image, createOrUpdateAd));
     }

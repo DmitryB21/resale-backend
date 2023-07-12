@@ -1,5 +1,6 @@
 package com.skypro.resale.service;
 
+import com.skypro.resale.dto.AdDto;
 import com.skypro.resale.dto.AdsDto;
 import com.skypro.resale.dto.CreateOrUpdateAd;
 import com.skypro.resale.dto.ExtendedAd;
@@ -10,9 +11,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface AdsService {
-    List<AdsDto> getAllAds();
+    List<AdDto> getAllAds();
 
-    AdsDto addAds(MultipartFile imageFiles, CreateOrUpdateAd createOrUpdateAd) throws IOException;
+    AdDto addAds(MultipartFile imageFiles, CreateOrUpdateAd createOrUpdateAd) throws IOException;
 
     ExtendedAd getAdsById(Integer id);
 
