@@ -1,6 +1,5 @@
 package com.skypro.resale.dto;
 
-
 import lombok.Data;
 
 @Data

@@ -1,11 +1,8 @@
 package com.skypro.resale.dto;
 
-import lombok.Data;
-
 import java.util.List;
 
-@Data
-public class AdsDto {
+public class CommentsDto {
     private Integer count;
-    private List<AdDto> adsDtos;
+    private List<CommentDto> results;
 }

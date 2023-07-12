@@ -2,12 +2,15 @@ package com.skypro.resale.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.Pattern;
+
+
 @Data
-public class Register {
-    private String username;
-    private String password;
+public class UpdateUser {
     private String firstName;
     private String lastName;
+    @Pattern(regexp = "^\\+7[0-9]{10}$", message = "")
     private String phone;
-    private Role role;
+
+
 }
