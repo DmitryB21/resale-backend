@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -30,10 +32,10 @@ public class AdsController {
                     @ApiResponse(
                             responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = AdDto.class))})
+                                    schema = @Schema(implementation = AdsDto.class))})
             }
     )
-    public ResponseEntity<List<AdDto>> getAllAds() {
+    public ResponseEntity<AdsDto> getAllAds() {
         return ResponseEntity.ok(adsService.getAllAds());
     }
 
@@ -100,7 +102,7 @@ public class AdsController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<AdsDto> updateAds(@PathVariable("id") Integer id,
+    public ResponseEntity<AdDto> updateAds(@PathVariable("id") Integer id,
                                             @RequestBody CreateOrUpdateAd createOrUpdateAd) {
         return ResponseEntity.ok(adsService.updateAds(id, createOrUpdateAd));
     }
@@ -112,7 +114,7 @@ public class AdsController {
                     @ApiResponse(
                             responseCode = "200", description = "OK",
                             content = { @Content(mediaType = "application/octet-stream",
-                                    schema = @Schema(implementation = UserDto.class))}),
+                                    schema = @Schema(implementation = Collection.class))}),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "404", description = "Not Found"),
                     @ApiResponse(responseCode = "403", description = "Forbidden")
@@ -131,13 +133,12 @@ public class AdsController {
                             responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AdsDto.class))}),
-                    @ApiResponse(responseCode = "401", description = "Unauthorised"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorised", content = @Content),
             }
     )
     @GetMapping("/me")
-    public ResponseEntity<List<AdsDto>> getAdsMe() {
-        return ResponseEntity.ok(adsService.getAdsMe());
+    public ResponseEntity<AdsDto> getAdsMe(Authentication authentication) {
+        return ResponseEntity.ok(adsService.getAdsMe(authentication));
     }
-
 
 }

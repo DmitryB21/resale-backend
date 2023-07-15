@@ -5,16 +5,18 @@ import com.skypro.resale.dto.AdsDto;
 import com.skypro.resale.dto.CreateOrUpdateAd;
 import com.skypro.resale.dto.ExtendedAd;
 import com.skypro.resale.model.Ad;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Service
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface AdsMapper {
 
-//    String ADS_IMAGE = "/ads/image/";
-    AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
+//    AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "author", ignore = true)
@@ -32,7 +34,7 @@ public interface AdsMapper {
     @Mapping(target = "email", source = "author.username")
     @Mapping(target = "image", source = "image", qualifiedByName = "imageMapping")
     @Mapping(target = "pk", source = "id")
-    ExtendedAd toExtendedAd(Ad ads);
+    ExtendedAd toExtendedAd(Ad ad);
 
 //    @Named("imageMapping")
 //    default String imageMapping(Image image) {
@@ -41,5 +43,22 @@ public interface AdsMapper {
 //        }
 //        return ADS_IMAGE + image.getId();
 //    }
+
+    /**
+     * adsListToResponseWrapperAdsDto(Integer sizeList, List<Ad> entityList):
+     * Этот метод отображает список объектов типа Ad на объект типа AllAdsOfUserDto,
+     * который представляет обертку для списка объявлений пользователя.
+     * Он также выполняет отображение поля sizeList на поле count и полей entityList на поле results.
+     */
+    @Mapping(source = "sizeList", target = "count")
+    @Mapping(source = "entityList", target = "results")
+    AdsDto adListToAdsDto(Integer sizeList, List<Ad> list);
+
+    /**
+     * adsListToAdsDtoList(List<Ad> adsList):
+     * Этот метод принимает список объектов типа Ad и отображает каждый объект на объект типа AdsDto.
+     * В результате возвращается список объектов типа AdsDto.
+     */
+    List<AdDto> adListToAdDtoList(List<Ad> adsList);
 
 }

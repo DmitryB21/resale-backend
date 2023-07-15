@@ -3,6 +3,8 @@ package com.skypro.resale.service.impl;
 import com.skypro.resale.dto.NewPassword;
 import com.skypro.resale.dto.UpdateUser;
 import com.skypro.resale.dto.UserDto;
+import com.skypro.resale.model.User;
+import com.skypro.resale.repository.UserRepository;
 import com.skypro.resale.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
 
     @Override
     public void updatePassword(NewPassword newPassword) {
@@ -30,5 +34,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserAvatar(MultipartFile avatar) {
 
+    }
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow();
     }
 }

@@ -5,15 +5,17 @@ import com.skypro.resale.mapper.AdsMapper;
 import com.skypro.resale.model.Ad;
 import com.skypro.resale.model.Image;
 import com.skypro.resale.repository.AdRepository;
+import com.skypro.resale.repository.ImageRepository;
 import com.skypro.resale.service.AdsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -22,56 +24,70 @@ public class AdsServiceImpl implements AdsService {
 
     private final AdRepository adRepository;
     private final ImageServiceImpl imageService;
+    private final AdsMapper adsMapper;
+    private final UserServiceImpl userService;
 
 
-    public List<AdDto> getAllAds() {
-        return adRepository.findAll().stream()
-                .map(ad -> AdsMapper.INSTANCE.toDto(ad))
-                .collect(Collectors.toList());
+
+    public AdsDto getAllAds() {
+        List<Ad> adList = adRepository.findAll();
+        Integer sizeList = adList.size();
+        return adsMapper.adListToAdsDto(sizeList, adList);
     }
 
+
     public AdDto addAds(MultipartFile image, CreateOrUpdateAd createOrUpdateAd) throws IOException {
-        Ad ad = AdsMapper.INSTANCE.toModel(createOrUpdateAd);
+        Ad ad = adsMapper.toModel(createOrUpdateAd);
 //        User user = userService.getUserByUsername(authentication.getName());
 //        ad.setAuthor(user);
         Image imageUpload = imageService.uploadImage(image);
         ad.setImage(imageUpload);
-        return AdsMapper.INSTANCE.toDto(adRepository.save(ad));
+        return adsMapper.toDto(adRepository.save(ad));
     }
 
     public ExtendedAd getAdsById(Integer id) {
-        return new ExtendedAd();
+//        log.debug("Getting ads by id: {}", id);
+        return adsMapper.toExtendedAd(findAdsById(id));
     }
+
+    public Ad findAdsById(Integer id) {
+//        log.debug("Finding ads by id: {}", id);
+        return adRepository.findById(id).orElseThrow();
+    }
+
 
     public void removeAdById(Integer id) {
-//        Ads ads = findAdsById(id);
-//        adsRepository.delete(ads);
+        Ad ad = findAdsById(id);
+        adRepository.delete(ad);
     }
 
 
-    public AdsDto updateAds(Integer id, CreateOrUpdateAd createAds) {
+
+    public AdDto updateAds(Integer id, CreateOrUpdateAd createAds) {
 
 //        if (createAds.getTitle() == null || createAds.getTitle().isBlank()
 //                || createAds.getDescription() == null || createAds.getDescription().isBlank()
 //                || createAds.getPrice() == null) throw new IncorrectArgumentException();
 
-//        Ads ads = findAdsById(id);
-//        ads.setTitle(createAds.getTitle());
-//        ads.setDescription(createAds.getDescription());
-//        ads.setPrice(createAds.getPrice());
-//        adsRepository.save(ads);
+        Ad ad = findAdsById(id);
+        ad.setTitle(createAds.getTitle());
+        ad.setDescription(createAds.getDescription());
+        ad.setPrice(createAds.getPrice());
+        adRepository.save(ad);
 //        log.info("Ads details updated for ads: {}", ads.getTitle());
-//        return AdsMapper.INSTANCE.toDto(ads);
-        return new AdsDto();
+        return adsMapper.toDto(ad);
+
     }
 
     public void updateImage(Integer id, MultipartFile imageFile) throws IOException {
-//        Ads ads = findAdsById(id);
-//        if (ads.getImage() != null) {
-//            imageService.remove(ads.getImage());
-//        }
-//        ads.setImage(imageService.uploadImage(imageFile));
-//        adsRepository.save(ads);
+//      log.debug("Updating ads image by id: {}", id);
+        Ad ad = findAdsById(id);
+        if (ad.getImage() != null) {
+            imageService.remove(ad.getImage());
+        }
+        ad.setImage(imageService.uploadImage(imageFile));
+        adRepository.save(ad);
+//        log.debug("Avatar updated for ads: {}", ads.getTitle());
     }
 
 
@@ -84,14 +100,20 @@ public class AdsServiceImpl implements AdsService {
         return new CommentDto();
     }
 
-    public List<AdsDto> getAdsMe() {
-//        return adsRepository.
-//                findAllByAuthorId(userService.getUserByUsername(authentication.getName()).getId())
-//                .stream()
-//                .map(AdsMapper.INSTANCE::toDto)
-//                .collect(Collectors.toList());
-        return new ArrayList<>();
-    }
+//    public List<AdsDto> getAdsMe() {
+////        return adsRepository.
+////                findAllByAuthorId(userService.getUserByUsername(authentication.getName()).getId())
+////                .stream()
+////                .map(AdsMapper.INSTANCE::toDto)
+////                .collect(Collectors.toList());
+//        return new ArrayList<>();
+
+        public AdsDto getAdsMe(Authentication authentication) {
+            List<Ad> adList = adRepository.findAllByAuthorId(userService.getUserByUsername(authentication.getName()).getId());
+            Integer sizeList = adList.size();
+            return adsMapper.adListToAdsDto(sizeList, adList);
+        }
+
 
 
 }
