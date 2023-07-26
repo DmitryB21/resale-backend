@@ -5,9 +5,11 @@ import com.skypro.resale.dto.AdsDto;
 import com.skypro.resale.dto.CreateOrUpdateAd;
 import com.skypro.resale.dto.ExtendedAd;
 import com.skypro.resale.model.Ad;
+import com.skypro.resale.model.Image;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,14 +20,17 @@ public interface AdsMapper {
 
 //    AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
 
+    String ADS_IMAGE = "/ads/image/";
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "author", ignore = true)
     @Mapping(target = "image", ignore = true)
+    @Mapping(target = "comments", ignore = true)
     Ad toModel(CreateOrUpdateAd dto);
 
     @Mapping(target = "pk", source = "id")
     @Mapping(target = "author", source = "author.id")
- //   @Mapping(target = "image", source = "image", qualifiedByName = "imageMapping")
+    @Mapping(target = "image", source = "image", qualifiedByName = "imageMapping")
     AdDto toDto(Ad ad);
 
     @Mapping(target = "authorFirstName", source = "author.firstName")
@@ -35,14 +40,14 @@ public interface AdsMapper {
     @Mapping(target = "image", source = "image", qualifiedByName = "imageMapping")
     @Mapping(target = "pk", source = "id")
     ExtendedAd toExtendedAd(Ad ad);
+    @Named("imageMapping")
+    default String imageMapping(Image image) {
+        if (image == null) {
+            return null;
+        }
+        return ADS_IMAGE + image.getId();
+    }
 
-//    @Named("imageMapping")
-//    default String imageMapping(Image image) {
-//        if (image == null) {
-//            return null;
-//        }
-//        return ADS_IMAGE + image.getId();
-//    }
 
     /**
      * adsListToResponseWrapperAdsDto(Integer sizeList, List<Ad> entityList):
@@ -51,7 +56,7 @@ public interface AdsMapper {
      * Он также выполняет отображение поля sizeList на поле count и полей entityList на поле results.
      */
     @Mapping(source = "sizeList", target = "count")
-    @Mapping(source = "entityList", target = "results")
+    @Mapping(source = "list", target = "results")
     AdsDto adListToAdsDto(Integer sizeList, List<Ad> list);
 
     /**

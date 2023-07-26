@@ -1,6 +1,7 @@
 package com.skypro.resale.controller;
 
 import com.skypro.resale.dto.CommentDto;
+import com.skypro.resale.dto.CommentsDto;
 import com.skypro.resale.dto.CreateOrUpdateComment;
 import com.skypro.resale.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,13 +29,13 @@ public class CommentController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentDto.class))}),
+                                    schema = @Schema(implementation = CommentsDto.class))}),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
             }
     )
     @GetMapping("/{id}/comments")
-    public ResponseEntity<List<CommentDto>> getComments(@PathVariable("id") Integer id) {
+    public ResponseEntity<CommentsDto> getComments(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(commentService.getComments(id));
     }
 
