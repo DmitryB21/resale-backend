@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,13 +31,9 @@ public class UserController {
     @Operation(
             summary = "Обновление пароля", tags = "Пользователи",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200", description = "OK",
-                            content = {@Content(mediaType = "application/json",
-                                        schema = @Schema(implementation = NewPassword.class))}),
-                    @ApiResponse(responseCode = "401", description = "Unauthorised"),
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "Not found")
             }
     )
     @PostMapping("/set_password")
@@ -56,8 +53,8 @@ public class UserController {
             }
     )
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getUser() {
-        return ResponseEntity.ok(userService.getUser());
+    public ResponseEntity<UserDto> getUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUser(authentication));
     }
 
     @Operation(
@@ -71,15 +68,16 @@ public class UserController {
             }
     )
     @PatchMapping("/me")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUser updateUser) {
-        return ResponseEntity.ok(userService.updateUser(updateUser));
+    public ResponseEntity<UpdateUser> updateUser(@RequestBody UpdateUser updateUser,
+                                              Authentication authentication) {
+        return ResponseEntity.ok(userService.updateUser(updateUser, authentication));
     }
 
     @Operation(
             summary = "Обновить аватар авторизованного пользователя", tags = "Пользователи",
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK"),
-                    @ApiResponse(responseCode = "404", description = "Not found")
+                    @ApiResponse(responseCode = "401", description = "Unauthorised")
             }
     )
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
