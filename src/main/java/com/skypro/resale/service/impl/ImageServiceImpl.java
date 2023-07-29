@@ -39,10 +39,10 @@ public class ImageServiceImpl implements ImageService<Image> {
         return savedImage;
     }
 
-//    @Override
-//    public Image getImageById(Integer id) {
+    @Override
+    public Image getImageById(Integer id) {
 //        log.debug("Getting image with id: {}", id);
-//        return imageRepository.findById(id).orElseThrow(ImageNotFoundException::new);
-//    }
+        return imageRepository.findById(id).orElseThrow();
+    }
 
 }

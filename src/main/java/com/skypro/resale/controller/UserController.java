@@ -4,6 +4,7 @@ import com.skypro.resale.dto.NewPassword;
 import com.skypro.resale.dto.UpdateUser;
 import com.skypro.resale.dto.UserDto;
 import com.skypro.resale.service.UserService;
+import com.skypro.resale.service.impl.AvatarServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,7 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-//    private final AvatarServiceImpl avatarService;
+    private final AvatarServiceImpl avatarService;
 
     @Operation(
             summary = "Обновление пароля", tags = "Пользователи",
@@ -81,15 +82,16 @@ public class UserController {
             }
     )
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateUserImage(@RequestPart("image") MultipartFile avatarFile) throws IOException {
-        userService.updateUserAvatar(avatarFile);
+    public ResponseEntity<?> updateUserAvatar(@RequestPart("image") MultipartFile avatarFile,
+                                              Authentication authentication) throws IOException {
+        userService.updateUserAvatar(avatarFile, authentication);
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(hidden = true)
-//    @GetMapping(value = "/avatar/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public byte[] getAvatar(@PathVariable("id") Integer id) {
-//        return avatarService.getImageById(id).getData();
-//    }
+    @Operation(hidden = true)
+    @GetMapping(value = "/avatar/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public byte[] getAvatar(@PathVariable("id") Integer id) {
+        return avatarService.getImageById(id).getData();
+    }
 
 }

@@ -10,6 +10,6 @@ public interface ImageService<T> {
 
     T uploadImage(MultipartFile file) throws IOException;
 
- //   T getImageById(Integer id);
+    T getImageById(Integer id);
 
 }

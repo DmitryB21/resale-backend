@@ -13,11 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AvatarServiceImpl avatarService;
 
     @Override
     public void updatePassword(NewPassword newPassword) {
@@ -53,9 +56,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserAvatar(MultipartFile avatar) {
+    public void updateUserAvatar(MultipartFile avatar,
+                                 Authentication authentication) throws IOException {
+        User user = getUserByUsername(authentication.getName());
 
+        if (user.getAvatar() != null) {
+            avatarService.remove(user.getAvatar());
+        }
+        user.setAvatar(avatarService.uploadImage(avatar));
+        userRepository.save(user);
+//        log.debug("Avatar updated for user: {}", authentication.getName());
     }
+
     public User getUserByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow();

@@ -2,6 +2,8 @@ package com.skypro.resale.controller;
 
 import com.skypro.resale.dto.*;
 import com.skypro.resale.service.AdsService;
+import com.skypro.resale.service.ImageService;
+import com.skypro.resale.service.impl.ImageServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,13 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -25,6 +27,7 @@ import java.util.List;
 public class AdsController {
 
     private final AdsService adsService;
+    private final ImageServiceImpl imageService;
 
     @Operation(
             summary = "Получить все объявления", tags = "Объявления",
@@ -53,8 +56,9 @@ public class AdsController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdDto> addAds(@RequestPart("image") MultipartFile image,
-                                         @RequestPart("properties") CreateOrUpdateAd createOrUpdateAd) throws IOException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(adsService.addAds(image, createOrUpdateAd));
+                                         @RequestPart("properties") CreateOrUpdateAd createOrUpdateAd,
+                                        Authentication authentication) throws IOException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(adsService.addAds(image, createOrUpdateAd, authentication));
     }
 
     @Operation(
@@ -70,7 +74,7 @@ public class AdsController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAd> getAds(@PathVariable("id") Integer id) {
-        return ResponseEntity.ok(adsService.getAdsById(id));
+        return ResponseEntity.ok(adsService.getAdById(id));
     }
 
 
@@ -83,6 +87,8 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not found")
             }
     )
+
+    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
         adsService.removeAdById(id);
@@ -101,6 +107,7 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not found")
             }
     )
+    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<AdDto> updateAds(@PathVariable("id") Integer id,
                                             @RequestBody CreateOrUpdateAd createOrUpdateAd) {
@@ -120,6 +127,7 @@ public class AdsController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
+    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImage(@PathVariable("id") Integer id,
                                             @RequestPart("image") MultipartFile imageFile) throws IOException {
@@ -139,6 +147,12 @@ public class AdsController {
     @GetMapping("/me")
     public ResponseEntity<AdsDto> getAdsMe(Authentication authentication) {
         return ResponseEntity.ok(adsService.getAdsMe(authentication));
+    }
+
+    @Operation(hidden = true)
+    @GetMapping(value = "/image/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public byte[] getImage(@PathVariable("id") Integer id) {
+        return imageService.getImageById(id).getData();
     }
 
 }

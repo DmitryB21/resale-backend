@@ -7,16 +7,14 @@ import com.skypro.resale.dto.ExtendedAd;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.List;
 
 public interface AdsService {
     AdsDto getAllAds();
 
-    AdDto addAds(MultipartFile imageFiles, CreateOrUpdateAd createOrUpdateAd) throws IOException;
+    AdDto addAds(MultipartFile imageFiles, CreateOrUpdateAd createOrUpdateAd, Authentication authentication) throws IOException;
 
-    ExtendedAd getAdsById(Integer id);
+    ExtendedAd getAdById(Integer id);
 
     void removeAdById(Integer id);
 

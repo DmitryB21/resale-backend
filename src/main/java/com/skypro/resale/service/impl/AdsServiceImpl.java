@@ -4,6 +4,7 @@ import com.skypro.resale.dto.*;
 import com.skypro.resale.mapper.AdsMapper;
 import com.skypro.resale.model.Ad;
 import com.skypro.resale.model.Image;
+import com.skypro.resale.model.User;
 import com.skypro.resale.repository.AdRepository;
 import com.skypro.resale.repository.ImageRepository;
 import com.skypro.resale.service.AdsService;
@@ -36,16 +37,19 @@ public class AdsServiceImpl implements AdsService {
     }
 
 
-    public AdDto addAds(MultipartFile image, CreateOrUpdateAd createOrUpdateAd) throws IOException {
+    public AdDto addAds(MultipartFile image, CreateOrUpdateAd createOrUpdateAd,  Authentication authentication) throws IOException {
+        if (createOrUpdateAd.getTitle() == null || createOrUpdateAd.getTitle().isBlank()
+                || createOrUpdateAd.getDescription() == null || createOrUpdateAd.getDescription().isBlank()
+                || createOrUpdateAd.getPrice() == null) throw new IllegalArgumentException();
         Ad ad = adsMapper.toModel(createOrUpdateAd);
-//        User user = userService.getUserByUsername(authentication.getName());
-//        ad.setAuthor(user);
+        User user = userService.getUserByUsername(authentication.getName());
+        ad.setAuthor(user);
         Image imageUpload = imageService.uploadImage(image);
         ad.setImage(imageUpload);
         return adsMapper.toDto(adRepository.save(ad));
     }
 
-    public ExtendedAd getAdsById(Integer id) {
+    public ExtendedAd getAdById(Integer id) {
 //        log.debug("Getting ads by id: {}", id);
         return adsMapper.toExtendedAd(findAdsById(id));
     }

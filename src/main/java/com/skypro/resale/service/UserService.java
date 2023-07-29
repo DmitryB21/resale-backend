@@ -16,7 +16,9 @@ public interface UserService {
 
     UpdateUser updateUser(UpdateUser updateUser, Authentication authentication);
 
-    void updateUserAvatar(MultipartFile avatar) throws IOException;
+//    void updateUserAvatar(MultipartFile avatar) throws IOException;
 
     public UserDto getUser(Authentication authentication);
+
+    void updateUserAvatar(MultipartFile avatar, Authentication authentication) throws IOException;
 }
