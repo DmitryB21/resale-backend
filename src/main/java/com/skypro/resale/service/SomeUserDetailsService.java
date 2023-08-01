@@ -35,15 +35,14 @@ public class SomeUserDetailsService implements UserDetailsService {
         }
     }
 
-    public void createUser(Register register) {
+    public void createUser(Register register, Role role) {
         if (userRepository.findByUsernameIgnoreCase(register.getUsername()).isPresent()) {
             throw new IncorrectUsernameException();
         }
-
         User user = new User();
         user.setUsername(register.getUsername());
         user.setPassword(passwordEncoder.encode(register.getPassword()));
-        user.setRole(Role.USER);
+        user.setRole(role);
         user.setFirstName(register.getFirstName());
         user.setLastName(register.getLastName());
         user.setPhone(register.getPhone());

@@ -10,26 +10,30 @@ import com.skypro.resale.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AvatarServiceImpl avatarService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void updatePassword(NewPassword newPassword) {
-//        User user = getUserByUsername(authentication.getName());
-//        if (!passwordEncoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
-//            throw new BadCredentialsException();
-//        }
-//        user.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
-//        userRepository.save(user);
+    public void updatePassword(NewPassword newPassword, Authentication authentication) {
+        User user = getUserByUsername(authentication.getName());
+        if (!passwordEncoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Bad Credentials");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
+        userRepository.save(user);
 //        log.debug("Password updated for user: {}", authentication.getName());
     }
 

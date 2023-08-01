@@ -3,6 +3,10 @@ package com.skypro.resale.controller;
 import com.skypro.resale.dto.Login;
 import com.skypro.resale.dto.Register;
 import com.skypro.resale.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,15 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "Авторизация пользователя", tags = "Авторизация",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "OK",
+                            content = { @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Login.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorised"),
+            }
+    )
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Login login) {
         if (authService.login(login.getUsername(), login.getPassword())) {
@@ -30,6 +43,15 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Регистрация пользователя", tags = "Регистрация",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201", description = "Created",
+                            content = { @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Register.class))}),
+                    @ApiResponse(responseCode = "401", description = "Unauthorised"),
+            }
+    )
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Register register) {
         if (authService.register(register)) {

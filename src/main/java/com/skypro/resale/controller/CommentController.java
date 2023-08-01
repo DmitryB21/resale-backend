@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,7 +65,8 @@ public class CommentController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-
+    @PreAuthorize("@commentServiceImpl.getCommentById(#commentId).getAuthor().username" +
+            "== authentication.name or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable("adId") Integer adId,
                                               @PathVariable("commentId") Integer commentId) {
@@ -83,7 +85,8 @@ public class CommentController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
             }
     )
-
+    @PreAuthorize("@commentServiceImpl.getCommentById(#commentId).getAuthor().username" +
+            "== authentication.name or hasRole('ROLE_ADMIN')")
     @PatchMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<CommentDto> updateComments(@PathVariable("adId") Integer adId,
                                                         @PathVariable("commentId") Integer commentId,

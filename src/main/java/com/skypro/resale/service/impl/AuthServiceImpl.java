@@ -1,6 +1,7 @@
 package com.skypro.resale.service.impl;
 
 import com.skypro.resale.dto.Register;
+import com.skypro.resale.dto.Role;
 import com.skypro.resale.service.AuthService;
 import com.skypro.resale.service.SomeUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.skypro.resale.dto.Role.USER;
 
 
 @Service
@@ -33,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(Register register) {
+        Role role = register.getRole() == null ? USER : register.getRole();
         if(register.getUsername() == null || register.getUsername().isBlank()
                 || register.getFirstName() == null || register.getFirstName().isBlank()
                 || register.getLastName() == null || register.getLastName().isBlank()
@@ -40,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
                 || register.getPassword() == null || register.getPassword().isBlank()) throw new IllegalArgumentException();
 
 //        log.info("Registering new user: {}", registerReq.getUsername());
-        manager.createUser(register);
+        manager.createUser(register, role);
 //        log.info("User {} registered successfully", registerReq.getUsername());
         return true;
     }

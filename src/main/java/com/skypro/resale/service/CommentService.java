@@ -3,6 +3,7 @@ package com.skypro.resale.service;
 import com.skypro.resale.dto.CommentDto;
 import com.skypro.resale.dto.CommentsDto;
 import com.skypro.resale.dto.CreateOrUpdateComment;
+import com.skypro.resale.model.Comment;
 import org.springframework.security.core.Authentication;
 
 
@@ -17,5 +18,5 @@ public interface CommentService {
 
     public CommentsDto getComments(Integer id);
 
-//    CommentDto getCommentById(Integer id);
+    Comment getCommentById(Integer id);
 }

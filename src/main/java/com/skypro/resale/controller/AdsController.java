@@ -1,8 +1,10 @@
 package com.skypro.resale.controller;
 
-import com.skypro.resale.dto.*;
+import com.skypro.resale.dto.AdDto;
+import com.skypro.resale.dto.AdsDto;
+import com.skypro.resale.dto.CreateOrUpdateAd;
+import com.skypro.resale.dto.ExtendedAd;
 import com.skypro.resale.service.AdsService;
-import com.skypro.resale.service.ImageService;
 import com.skypro.resale.service.impl.ImageServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,6 +40,7 @@ public class AdsController {
                                     schema = @Schema(implementation = AdsDto.class))})
             }
     )
+    @GetMapping
     public ResponseEntity<AdsDto> getAllAds() {
         return ResponseEntity.ok(adsService.getAllAds());
     }
@@ -88,8 +91,7 @@ public class AdsController {
             }
     )
 
-    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
-    @DeleteMapping("/{id}")
+    @PreAuthorize("@adsServiceImpl.getAdsById(#id).getEmail() == authentication.name or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
         adsService.removeAdById(id);
         return ResponseEntity.ok().build();
@@ -107,7 +109,7 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not found")
             }
     )
-    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@adsServiceImpl.getAdsById(#id).getEmail() == authentication.name or hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<AdDto> updateAds(@PathVariable("id") Integer id,
                                             @RequestBody CreateOrUpdateAd createOrUpdateAd) {
@@ -127,7 +129,7 @@ public class AdsController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
-    @PreAuthorize("adsServiceImpl.getAdById(id).getEmail() == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@adsServiceImpl.getAdsById(#id).getEmail() == authentication.name or hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImage(@PathVariable("id") Integer id,
                                             @RequestPart("image") MultipartFile imageFile) throws IOException {

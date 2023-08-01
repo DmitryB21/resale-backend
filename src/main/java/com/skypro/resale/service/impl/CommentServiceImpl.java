@@ -12,6 +12,7 @@ import com.skypro.resale.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 //    private final CommentRepository commentRepository;
@@ -71,10 +73,10 @@ public class CommentServiceImpl implements CommentService {
 //        log.debug("Getting comment with id: {} for ads with id: {}", commentId, adId);
         return commentRepository.findByIdAndAdsId(commentId, adId).orElseThrow();
     }
-//
-//    @Override
-//    public Comment getCommentById(Integer id) {
+
+    @Override
+    public Comment getCommentById(Integer id) {
 //        log.debug("Getting comment with id: {}", id);
-//        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
-//    }
+        return commentRepository.findById(id).orElseThrow();
+    }
 }
