@@ -2,8 +2,9 @@ package com.skypro.resale.service.impl;
 
 import com.skypro.resale.dto.Register;
 import com.skypro.resale.dto.Role;
+import com.skypro.resale.exception.IncorrectArgumentException;
 import com.skypro.resale.service.AuthService;
-import com.skypro.resale.service.SomeUserDetailsService;
+import com.skypro.resale.config.SomeUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 || register.getFirstName() == null || register.getFirstName().isBlank()
                 || register.getLastName() == null || register.getLastName().isBlank()
                 || register.getPhone() == null || register.getPhone().isBlank()
-                || register.getPassword() == null || register.getPassword().isBlank()) throw new IllegalArgumentException();
+                || register.getPassword() == null || register.getPassword().isBlank()) throw new IncorrectArgumentException();
 
 //        log.info("Registering new user: {}", registerReq.getUsername());
         manager.createUser(register, role);

@@ -3,6 +3,7 @@ package com.skypro.resale.service.impl;
 import com.skypro.resale.dto.NewPassword;
 import com.skypro.resale.dto.UpdateUser;
 import com.skypro.resale.dto.UserDto;
+import com.skypro.resale.exception.UsernameNotFoundException;
 import com.skypro.resale.mapper.UserMapper;
 import com.skypro.resale.model.User;
 import com.skypro.resale.repository.UserRepository;
@@ -74,6 +75,6 @@ public class UserServiceImpl implements UserService {
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow();
+                .orElseThrow(UsernameNotFoundException::new);
     }
 }

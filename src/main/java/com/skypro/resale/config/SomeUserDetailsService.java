@@ -1,9 +1,8 @@
-package com.skypro.resale.service;
+package com.skypro.resale.config;
 
 import com.skypro.resale.dto.Register;
 import com.skypro.resale.dto.Role;
-import com.skypro.resale.dto.SomeUserDetails;
-import com.skypro.resale.exceptiom.IncorrectUsernameException;
+import com.skypro.resale.exception.IncorrectUsernameException;
 import com.skypro.resale.model.User;
 import com.skypro.resale.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

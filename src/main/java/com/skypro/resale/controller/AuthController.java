@@ -49,7 +49,7 @@ public class AuthController {
                             responseCode = "201", description = "Created",
                             content = { @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = Register.class))}),
-                    @ApiResponse(responseCode = "401", description = "Unauthorised"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request")
             }
     )
     @PostMapping("/register")

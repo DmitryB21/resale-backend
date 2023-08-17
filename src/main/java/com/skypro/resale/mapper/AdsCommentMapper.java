@@ -58,7 +58,7 @@ public interface AdsCommentMapper {
     @Mapping(target = "authorFirstName", source = "author.firstName")
     @Mapping(target = "authorImage", source = "author.avatar", qualifiedByName = "avatarMapping")
     @Mapping(target = "pk", source = "id")
-    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "createdAt", source = "createdAt")
     CommentDto commentToCommentDto(Comment comment);
 
     @Named("avatarMapping")

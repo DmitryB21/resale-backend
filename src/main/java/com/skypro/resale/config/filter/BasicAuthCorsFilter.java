@@ -1,4 +1,4 @@
-package com.skypro.resale.filter;
+package com.skypro.resale.config.filter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

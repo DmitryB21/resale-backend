@@ -1,4 +1,4 @@
-package com.skypro.resale.dto;
+package com.skypro.resale.config;
 
 import com.skypro.resale.model.User;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class SomeUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface CommentService {
-    CommentDto addComment(Integer id, CreateOrUpdateComment createOrUpdateComment);
+    CommentDto addComment(Integer id, CreateOrUpdateComment createOrUpdateComment, Authentication authentication);
 
     void deleteComment(Integer adId, Integer commentId);
 

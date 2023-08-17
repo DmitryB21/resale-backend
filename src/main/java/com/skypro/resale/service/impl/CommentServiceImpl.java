@@ -9,6 +9,8 @@ import com.skypro.resale.model.Comment;
 import com.skypro.resale.model.User;
 import com.skypro.resale.repository.CommentRepository;
 import com.skypro.resale.service.CommentService;
+import com.skypro.resale.service.impl.AdsServiceImpl;
+import com.skypro.resale.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -32,21 +34,24 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentsDto getComments(Integer id) {
-         List<Comment> commentList = commentRepository.findAll();
+         List<Comment> commentList = commentRepository.findAllByAdsId(id);
         Integer sizeList = commentList.size();
         return adsCommentMapper.commentListToCommentsDto(sizeList, commentList);
     }
 
     @Override
-    public CommentDto addComment(Integer id, CreateOrUpdateComment createOrUpdateComment) {
+    public CommentDto addComment(Integer id, CreateOrUpdateComment createOrUpdateComment, Authentication authentication) {
 
         if(createOrUpdateComment.getText() == null || createOrUpdateComment.getText().isBlank()) throw new IllegalArgumentException();
 
-        Comment comment = adsCommentMapper.createCommentToEntity(createOrUpdateComment);
-//        User user = userService.getUserByUsername(authentication.getName());
-//        comment.setAuthor(user);
+//        Comment comment = adsCommentMapper.createCommentToEntity(createOrUpdateComment);
+        Comment comment  = new Comment();
+        User user = userService.getUserByUsername(authentication.getName());
+        comment.setAuthor(user);
         comment.setAds(adsService.findAdsById(id));
-        comment.setCreatedAt(Instant.now());
+        Long millis = Instant.now().toEpochMilli();
+        comment.setCreatedAt(millis);
+        comment.setText(createOrUpdateComment.getText());
         commentRepository.save(comment);
         return adsCommentMapper.commentToCommentDto(comment);
     }

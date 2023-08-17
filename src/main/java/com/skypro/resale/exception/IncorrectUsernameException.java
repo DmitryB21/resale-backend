@@ -1,4 +1,4 @@
-package com.skypro.resale.exceptiom;
+package com.skypro.resale.exception;
 
 public class IncorrectUsernameException extends RuntimeException{
 }

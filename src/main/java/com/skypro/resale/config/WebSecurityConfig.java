@@ -28,8 +28,9 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
             "/ads",
             "/ads/*",
             "/ads/image/**",
-            "/ads/avatar/**",
-            "/ads/*/comments"
+            "/ads/avatar/*",
+            "/ads/*/comments",
+            "/users/avatar/*"
     };
 
 //    public WebSecurityConfig(UserService userService) {
