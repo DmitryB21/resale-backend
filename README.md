@@ -18,8 +18,7 @@ CRUD-операции для комментариев объявлений: По
 
 Проект разработан с использованием следующих технологий и инструментов:
 
-<b>Язык программирования:</b> Java,
-
+<b>Java Core, Maven, Gradle, Spring Boot, Spring Web, Spring Data JPA, Spring Security, Stream API, REST, GIT, Swagger, Lombok, Mapstruct, PostgreSQL, JUnit, Mockito, Liquibase
 <b>Фреймворк:</b> Spring Boot, Spring Security.
 
 <b>База данных:</b> PostgreSQL.
