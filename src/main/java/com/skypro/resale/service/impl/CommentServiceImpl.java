@@ -3,25 +3,23 @@ package com.skypro.resale.service.impl;
 import com.skypro.resale.dto.CommentDto;
 import com.skypro.resale.dto.CommentsDto;
 import com.skypro.resale.dto.CreateOrUpdateComment;
+import com.skypro.resale.exception.CommentNotFoundException;
 import com.skypro.resale.mapper.AdsCommentMapper;
-import com.skypro.resale.model.Ad;
 import com.skypro.resale.model.Comment;
 import com.skypro.resale.model.User;
 import com.skypro.resale.repository.CommentRepository;
 import com.skypro.resale.service.CommentService;
-import com.skypro.resale.service.impl.AdsServiceImpl;
-import com.skypro.resale.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -44,7 +42,6 @@ public class CommentServiceImpl implements CommentService {
 
         if(createOrUpdateComment.getText() == null || createOrUpdateComment.getText().isBlank()) throw new IllegalArgumentException();
 
-//        Comment comment = adsCommentMapper.createCommentToEntity(createOrUpdateComment);
         Comment comment  = new Comment();
         User user = userService.getUserByUsername(authentication.getName());
         comment.setAuthor(user);
@@ -60,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Integer adId, Integer commentId) {
         Comment comment = getAdsComment(commentId, adId);
         commentRepository.delete(comment);
-//        log.info("Comment removed successfully");
+        log.info("Comment removed successfully");
     }
 
     @Override
@@ -75,13 +72,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     public Comment getAdsComment(Integer commentId, Integer adId) {
-//        log.debug("Getting comment with id: {} for ads with id: {}", commentId, adId);
-        return commentRepository.findByIdAndAdsId(commentId, adId).orElseThrow();
+        log.debug("Getting comment with id: {} for ads with id: {}", commentId, adId);
+        return commentRepository.findByIdAndAdsId(commentId, adId).orElseThrow(CommentNotFoundException::new);
     }
 
     @Override
     public Comment getCommentById(Integer id) {
-//        log.debug("Getting comment with id: {}", id);
-        return commentRepository.findById(id).orElseThrow();
+        log.debug("Getting comment with id: {}", id);
+        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 }

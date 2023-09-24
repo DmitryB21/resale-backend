@@ -15,8 +15,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
 
-//    private final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-//    private final UserService userService;
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
@@ -32,15 +30,6 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
             "/ads/*/comments",
             "/users/avatar/*"
     };
-
-//    public WebSecurityConfig(UserService userService) {
-//        this.userService = userService;
-//    }
-
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService() {
-//        return new InMemoryUserDetailsManager(userService.getUserDetails());
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

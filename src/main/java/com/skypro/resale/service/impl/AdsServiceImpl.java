@@ -1,6 +1,7 @@
 package com.skypro.resale.service.impl;
 
 import com.skypro.resale.dto.*;
+import com.skypro.resale.exception.AdsNotFoundException;
 import com.skypro.resale.exception.IncorrectArgumentException;
 import com.skypro.resale.mapper.AdsMapper;
 import com.skypro.resale.model.Ad;
@@ -9,6 +10,7 @@ import com.skypro.resale.model.User;
 import com.skypro.resale.repository.AdRepository;
 import com.skypro.resale.service.AdsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -51,13 +53,13 @@ public class AdsServiceImpl implements AdsService {
     }
 
     public ExtendedAd getAdById(Integer id) {
-//        log.debug("Getting ads by id: {}", id);
+        log.debug("Getting ad by id: {}", id);
         return adsMapper.toExtendedAd(findAdsById(id));
     }
 
     public Ad findAdsById(Integer id) {
-//        log.debug("Finding ads by id: {}", id);
-        return adRepository.findById(id).orElseThrow();
+        log.debug("Finding ad by id: {}", id);
+        return adRepository.findById(id).orElseThrow(AdsNotFoundException::new);
     }
 
 
@@ -79,23 +81,21 @@ public class AdsServiceImpl implements AdsService {
         ad.setDescription(createAds.getDescription());
         ad.setPrice(createAds.getPrice());
         adRepository.save(ad);
-//        log.info("Ads details updated for ads: {}", ads.getTitle());
+        log.info("Ad details updated for ad: {}", ad.getTitle());
         return adsMapper.toDto(ad);
 
     }
 
     public void updateImage(Integer id, MultipartFile imageFile) throws IOException {
-//      log.debug("Updating ads image by id: {}", id);
+      log.debug("Updating ad image by id: {}", id);
         Ad ad = findAdsById(id);
         if (ad.getImage() != null) {
             imageService.remove(ad.getImage());
         }
         ad.setImage(imageService.uploadImage(imageFile));
         adRepository.save(ad);
-//        log.debug("Avatar updated for ads: {}", ads.getTitle());
+        log.debug("Avatar updated for ad: {}", ad.getTitle());
     }
-
-
 
     public List<CommentDto> getComments(Integer id) {
         return new ArrayList<>();
@@ -104,14 +104,6 @@ public class AdsServiceImpl implements AdsService {
     public CommentDto addComment(Integer id, CommentDto newCommentDto) {
         return new CommentDto();
     }
-
-//    public List<AdsDto> getAdsMe() {
-////        return adsRepository.
-////                findAllByAuthorId(userService.getUserByUsername(authentication.getName()).getId())
-////                .stream()
-////                .map(AdsMapper.INSTANCE::toDto)
-////                .collect(Collectors.toList());
-//        return new ArrayList<>();
 
         public AdsDto getAdsMe(Authentication authentication) {
             List<Ad> adList = adRepository.findAllByAuthorId(userService.getUserByUsername(authentication.getName()).getId());

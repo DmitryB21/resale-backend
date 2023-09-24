@@ -18,7 +18,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface AdsMapper {
 
-//    AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
 
     String ADS_IMAGE = "/ads/image/";
 
@@ -48,22 +47,10 @@ public interface AdsMapper {
         return ADS_IMAGE + image.getId();
     }
 
-
-    /**
-     * adsListToResponseWrapperAdsDto(Integer sizeList, List<Ad> entityList):
-     * Этот метод отображает список объектов типа Ad на объект типа AllAdsOfUserDto,
-     * который представляет обертку для списка объявлений пользователя.
-     * Он также выполняет отображение поля sizeList на поле count и полей entityList на поле results.
-     */
     @Mapping(source = "sizeList", target = "count")
     @Mapping(source = "list", target = "results")
     AdsDto adListToAdsDto(Integer sizeList, List<Ad> list);
 
-    /**
-     * adsListToAdsDtoList(List<Ad> adsList):
-     * Этот метод принимает список объектов типа Ad и отображает каждый объект на объект типа AdsDto.
-     * В результате возвращается список объектов типа AdsDto.
-     */
     List<AdDto> adListToAdDtoList(List<Ad> adsList);
 
 }

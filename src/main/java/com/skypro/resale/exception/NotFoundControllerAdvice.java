@@ -14,19 +14,19 @@ public class NotFoundControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-//    @ExceptionHandler(AdsNotFoundException.class)
-//    public ResponseEntity<?> notFoundAds(){
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//    }
-//
-//    @ExceptionHandler(ImageNotFoundException.class)
-//    public ResponseEntity<?> notFoundImage(){
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//    }
-//
-//    @ExceptionHandler(CommentNotFoundException.class)
-//    public ResponseEntity<?> notFoundComment() {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//    }
+    @ExceptionHandler(AdsNotFoundException.class)
+    public ResponseEntity<?> notFoundAds(){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ResponseEntity<?> notFoundImage(){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<?> notFoundComment() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.skypro.resale.service.impl;
 
+import com.skypro.resale.exception.ImageNotFoundException;
 import com.skypro.resale.model.Image;
 import com.skypro.resale.repository.ImageRepository;
 import com.skypro.resale.service.ImageService;
@@ -29,20 +30,20 @@ public class ImageServiceImpl implements ImageService<Image> {
 
     @Override
     public Image uploadImage(MultipartFile imageFile) throws IOException {
-//        log.debug("Uploading image file: " + imageFile.getOriginalFilename());
+        log.debug("Uploading image file: " + imageFile.getOriginalFilename());
         Image image = new Image();
         image.setMediaType(imageFile.getContentType());
         image.setFileSize(imageFile.getSize());
         image.setData(imageFile.getBytes());
         Image savedImage = imageRepository.save(image);
-//        log.info("Image successfully uploaded with id {}", savedImage.getId());
+        log.info("Image successfully uploaded with id {}", savedImage.getId());
         return savedImage;
     }
 
     @Override
     public Image getImageById(Integer id) {
-//        log.debug("Getting image with id: {}", id);
-        return imageRepository.findById(id).orElseThrow();
+        log.debug("Getting image with id: {}", id);
+        return imageRepository.findById(id).orElseThrow(ImageNotFoundException::new);
     }
 
 }
