@@ -2,13 +2,13 @@ package com.skypro.resale.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skypro.resale.config.SomeUserDetailsService;
-import com.skypro.resale.dto.CreateOrUpdateAd;
+import com.skypro.resale.dto.CommentDto;
 import com.skypro.resale.dto.Role;
 import com.skypro.resale.model.Ad;
-import com.skypro.resale.model.Image;
+import com.skypro.resale.model.Comment;
 import com.skypro.resale.model.User;
 import com.skypro.resale.repository.AdRepository;
-import com.skypro.resale.repository.ImageRepository;
+import com.skypro.resale.repository.CommentRepository;
 import com.skypro.resale.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockPart;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,37 +24,38 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class AdsControllerTest {
+public class CommentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private AdRepository adRepository;
+    private PasswordEncoder encoder;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private PasswordEncoder encoder;
-    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdRepository adsRepository;
+    @Autowired
+    private CommentRepository commentRepository;
     @Autowired
     private SomeUserDetailsService userDetailsService;
 
     private Authentication auth;
-    @Autowired
-    private ImageRepository imageRepository;
-    private final MockPart imageFile
-            = new MockPart("image", "image", "image".getBytes());
     private final User user = new User();
-    private final CreateOrUpdateAd createAds = new CreateOrUpdateAd();
     private final Ad ads = new Ad();
-    private final Image image = new Image();
+    private final Comment comment = new Comment();
+    private final CommentDto commentDto = new CommentDto();
 
     @BeforeEach
     void setUp() {
@@ -64,7 +64,7 @@ public class AdsControllerTest {
         user.setLastName("Test");
         user.setPhone("+79609279284");
         user.setPassword(encoder.encode("password"));
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.USER);
         userRepository.save(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
@@ -76,65 +76,68 @@ public class AdsControllerTest {
         ads.setDescription("description");
         ads.setPrice(1000);
         ads.setAuthor(user);
-        adRepository.save(ads);
+        adsRepository.save(ads);
+
+        comment.setText("Text");
+        comment.setAds(ads);
+        comment.setCreatedAt(Instant.now().toEpochMilli());
+        comment.setAuthor(user);
+        commentRepository.save(comment);
     }
 
     @AfterEach
-    void cleanUp() {
+    void cleatUp() {
+        commentRepository.delete(comment);
+        adsRepository.delete(ads);
         userRepository.delete(user);
     }
 
     @Test
-    public void testGetAllAdsReturnsCorrectAdsList() throws Exception {
-        mockMvc.perform(get("/ads"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").exists())
-                .andExpect(jsonPath("$.count").isNumber())
-                .andExpect(jsonPath("$.results").isArray());
-    }
-
-    @Test
-    public void testGetFullAddReturnsCorrectAds() throws Exception {
-        mockMvc.perform(get("/ads/{id}", ads.getId())
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pk").value(ads.getId()))
-                .andExpect(jsonPath("$.title").value(ads.getTitle()))
-                .andExpect(jsonPath("$.description").value(ads.getDescription()))
-                .andExpect(jsonPath("$.price").value(ads.getPrice()))
-                .andExpect(jsonPath("$.email").value(user.getUsername()))
-                .andExpect(jsonPath("$.authorFirstName").value(user.getFirstName()))
-                .andExpect(jsonPath("$.authorLastName").value(user.getLastName()))
-                .andExpect(jsonPath("$.phone").value(user.getPhone()));
-    }
-
-    @Test
-    public void testGetAdsMeReturnsCorrectAdsList() throws Exception {
-        mockMvc.perform(get("/ads/me")
+    public void testGetCommentsReturnsCorrectCommentsList() throws Exception {
+        mockMvc.perform(get("/ads/{id}/comments", ads.getId())
                         .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.count").isNumber())
-                .andExpect(jsonPath("$.results").isArray());
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results[0].text").value(comment.getText()));
     }
 
     @Test
-    public void testGetImage() throws Exception {
-        image.setData("image".getBytes());
-        image.setMediaType("image/jpeg");
-        imageRepository.save(image);
-        ads.setImage(image);
-        adRepository.save(ads);
+    public void testAddAdsCommentReturnsAddedComment() throws Exception {
+        commentDto.setText("TEXT");
 
-        mockMvc.perform(get("/ads/image/{id}", image.getId())
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        mockMvc.perform(post("/ads/{id}/comments", ads.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(commentDto))
                         .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(content().bytes(image.getData()));
+                .andExpect(jsonPath("$.pk").isNumber())
+                .andExpect(jsonPath("$.text").value(commentDto.getText()))
+                .andExpect(jsonPath("$.authorFirstName").value(user.getFirstName()));
+    }
+
+    @Test
+    public void testDeleteAdsCommentReturnsOkWhenCommentRemoved() throws Exception {
+        mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", ads.getId(), comment.getId())
+                        .with(authentication(auth)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testUpdateCommentsReturnsUpdatedComment() throws Exception {
+        String newText = "New Text";
+        comment.setText(newText);
+        commentRepository.save(comment);
+
+        mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", ads.getId(), comment.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(comment))
+                        .with((authentication(auth))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value(comment.getText()));
     }
 
 
 
 }
-
-

@@ -92,6 +92,7 @@ public class AdsController {
     )
 
     @PreAuthorize("@adsServiceImpl.getAdsById(#id).getEmail() == authentication.name or hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> removeAd(@PathVariable("id") Integer id) {
         adsService.removeAdById(id);
         return ResponseEntity.ok().build();
